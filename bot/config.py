@@ -21,6 +21,7 @@ else:
 sys.stdout.reconfigure(encoding="utf-8")
 disk_app_folder_name = '????????'
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+API = os.getenv('API')
 storage = MemoryStorage()
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=storage)
@@ -29,3 +30,5 @@ DEFAULT_COMMANDS = (
     ('start', "Старт / Перезапуск"),
     ('help', "Помогите")
 )
+services = ("YouTube", )
+api = '...'

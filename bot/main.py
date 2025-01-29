@@ -19,7 +19,6 @@ async def set_default_commands():
 async def main():
     logging.info("----- Bot started -----")
 
-    # set default commands
     await set_default_commands()
 
     # connect routes
@@ -29,7 +28,6 @@ async def main():
     dp.include_router(echo.echo_router)
     dp.include_router(youtube.youtube_router)
 
-    # start
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
