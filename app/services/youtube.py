@@ -1,8 +1,6 @@
-
 import yt_dlp
 import os
 from config.logging_config import logger
-import re
 import uuid
 import time
 
@@ -15,7 +13,8 @@ async def generate_unique_string(prefix: str = "") -> str:
     return unique_str
 
 
-async def download_video(url, output_dir='uploads'):
+async def download_video(url, output_dir='uploads') -> str:
+    """Скачивает видео и возвращает имя файла"""
     try:
         app_logger.info(f"download_video({url})")
 

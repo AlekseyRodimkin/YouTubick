@@ -3,15 +3,8 @@
 
 {% block content %}
 <main style="background-color: rgb(35, 39, 43); padding: 2em; border-radius: 1.5em">
-    <div class="row g-5">
-        <div class="col-md-7 col-lg-8 order-md-last">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-primary">Видео</span>
-            </h4>
-            <div class="card">
+    <div class="row">
 
-            </div>
-        </div>
         <div class="col-md-5 col-lg-4">
             <h4 class="mb-3">Буковки циферки</h4>
             <div class="row g-3">
@@ -26,18 +19,18 @@
                     </div>
                     <div class="my-3">
                         <div class="form-check">
-                            <input id="download" name="action" type="radio" class="form-check-input"
-                                   value="download" checked required>
+                            <input id="download" name="action" type="radio" class="form-check-input" value="download"
+                                   checked required>
                             <label class="form-check-label" for="download">Скачать</label>
                         </div>
                         <div class="form-check">
-                            <input id="longPlay" name="action" type="radio" class="form-check-input"
-                                   value="long_play" required>
+                            <input id="longPlay" name="action" type="radio" class="form-check-input" value="long_play"
+                                   required>
                             <label class="form-check-label" for="longPlay">Смотреть после загрузки</label>
                         </div>
                         <div class="form-check">
-                            <input id="fastPlay" name="action" type="radio" class="form-check-input"
-                                   value="fast_play" required>
+                            <input id="fastPlay" name="action" type="radio" class="form-check-input" value="fast_play"
+                                   required>
                             <label class="form-check-label" for="fastPlay">Смотреть LIVE</label>
                         </div>
                     </div>
@@ -45,6 +38,21 @@
                 </form>
             </div>
         </div>
+
+        {% if video_url %}
+        <div class="col-md-7 col-lg-8 order-md-last">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-primary">Видео</span>
+            </h4>
+            <div class="card p-3">
+                <video id="videoPlayer" class="w-100" controls preload="metadata">
+                    <source src="{{ video_url }}" type="video/mp4">
+                    Ваш браузер не поддерживает воспроизведение видео.
+                </video>
+            </div>
+        </div>
+        {% endif %}
+
     </div>
 </main>
 {% endblock %}

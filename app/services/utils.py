@@ -40,7 +40,7 @@ async def is_valid_youtube_url(url: str) -> bool:
         return False
 
 
-async def file_streamer(path: str, chunk_size: int = 1024 * 1024):
+def file_streamer(path: str, chunk_size: int = 1024 * 1024):
     """Передает файл, удаляет по завершению"""
     try:
         app_logger.info(f"file_streamer({path})")
@@ -51,3 +51,12 @@ async def file_streamer(path: str, chunk_size: int = 1024 * 1024):
     finally:
         os.remove(path)
         app_logger.info(f"Файл удалён: {path}")
+
+
+def delete_file(path: str):
+    """Функция удаления файла"""
+    try:
+        os.remove(path)
+        app_logger.info(f"Файл удалён после просмотра: {path}")
+    except Exception as e:
+        app_logger.error(f"Ошибка удаления файла: {e}")
