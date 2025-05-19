@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block content %}
+<main class="container py-4" style="background-color: rgb(35, 39, 43); border-radius: 1.5em;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="list-group">
+                {% for address in crypto_addresses %}
+                <div class="list-group-item bg-secondary text-white mb-2 rounded-3 p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <!-- Лого -->
+                            <span class="fw-bold">{{ address.currency }}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <input type="text"
+                                   class="form-control form-control-sm bg-dark text-white me-2 copy-input"
+                                   value="{{ address.address }}"
+                                   readonly
+                                   style="width: 180px;">
+                            <button class="btn btn-sm btn-outline-light copy-btn">
+                                <i class="bi bi-clipboard"></i> Копировать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Копирование адресов
+        const copyButtons = document.querySelectorAll('.copy-btn');
+        copyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('.copy-input');
+                input.select();
+                document.execCommand('copy');
+
+                // Временная смена текста кнопки
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="bi bi-check"></i> Скопировано!';
+
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+    });
+</script>
+{% endblock %}

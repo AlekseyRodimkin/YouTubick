@@ -2,57 +2,172 @@
 {% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
-<main style="background-color: rgb(35, 39, 43); padding: 2em; border-radius: 1.5em">
-    <div class="row">
+<main class="container py-4" style="background-color: rgb(35, 39, 43); border-radius: 1.5em;">
+    <div class="row g-4" style="min-height: 350px;">
 
-        <div class="col-md-5 col-lg-4">
-            <h4 class="mb-3">Буковки циферки</h4>
-            <div class="row g-3">
-                <form action="/" method="POST">
+        <div class="{% if video_url %}col-md-5 col-lg-4{% else %}col-12{% endif %}">
+            <div class="{% if not video_url %}col-10 col-sm-8 col-md-6 mx-auto text-center{% endif %}">
+
+                <h5 class="mb-3 text-primary">Вставьте ссылку и выберите действие</h5>
+                <form id="downloadForm" method="POST" class="row g-3">
                     <div class="col-12">
                         <label for="url" class="form-label">Ссылка</label>
                         <input type="text" class="form-control" id="url" name="url" placeholder="https://youtube.com..."
                                required>
                         <div class="invalid-feedback">
-                            Please enter your shipping address.
+                            Пожалуйста, введите ссылку.
                         </div>
                     </div>
-                    <div class="my-3">
-                        <div class="form-check">
+
+                    <div class="col-12">
+                        <div class="form-check d-flex align-items-center gap-2 mb-2">
                             <input id="download" name="action" type="radio" class="form-check-input" value="download"
                                    checked required>
-                            <label class="form-check-label" for="download">Скачать</label>
+                            <label class="form-check-label mb-0" for="download">Скачать</label>
                         </div>
-                        <div class="form-check">
-                            <input id="longPlay" name="action" type="radio" class="form-check-input" value="long_play"
+                        <div class="form-check d-flex align-items-center gap-2">
+                            <input id="livePlay" name="action" type="radio" class="form-check-input" value="live_play"
                                    required>
-                            <label class="form-check-label" for="longPlay">Смотреть после загрузки</label>
-                        </div>
-                        <div class="form-check">
-                            <input id="fastPlay" name="action" type="radio" class="form-check-input" value="fast_play"
-                                   required>
-                            <label class="form-check-label" for="fastPlay">Смотреть LIVE</label>
+                            <label class="form-check-label mb-0" for="livePlay">Смотреть LIVE</label>
                         </div>
                     </div>
-                    <button class="w-100 btn btn-primary btn-lg" type="submit">Погнали</button>
+
+
+                    <div class="col-12">
+                        <button class="w-100 btn btn-primary btn-lg" type="submit" id="submitBtn">Погнали</button>
+                    </div>
+
+                    <div id="loadingSpinner" class="text-center my-4" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Загрузка...</span>
+                        </div>
+                    </div>
                 </form>
             </div>
-        </div>
 
-        {% if video_url %}
-        <div class="col-md-7 col-lg-8 order-md-last">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-primary">Видео</span>
-            </h4>
-            <div class="card p-3">
-                <video id="videoPlayer" class="w-100" controls preload="metadata">
-                    <source src="{{ video_url }}" type="video/mp4">
-                    Ваш браузер не поддерживает воспроизведение видео.
-                </video>
+            {% if video_url %}
+            <div class="col-md-7 col-lg-8">
+                <h4 class="mb-3 text-primary">Видео</h4>
+                <div class="card p-3">
+                    <video id="videoPlayer" class="w-100" controls preload="metadata">
+                        <source src="{{ video_url }}" type="video/mp4">
+                        Ваш браузер не поддерживает воспроизведение видео.
+                    </video>
+                </div>
             </div>
-        </div>
-        {% endif %}
+            {% endif %}
 
+        </div>
+    </div>
+
+    <div class="mt-4 p-3 bg-dark rounded shadow-sm">
+        <h6 class="text-light">Как это работает?</h6>
+        <p class="text-muted mb-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-1-circle"
+                 viewBox="0 0 16 16">
+                <path d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M9.283 4.002V12H7.971V5.338h-.065L6.072 6.656V5.385l1.899-1.383z"/>
+            </svg>
+            Скопируйте ссылку на видео прямо с YouTube (поделиться видео, скопировать) или из браузера
+            (скопировать адрес ссылки)
+        </p>
+
+        <p class="text-muted mb-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-2-circle"
+                 viewBox="0 0 16 16">
+                <path d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.646 6.24v.07H5.375v-.064c0-1.213.879-2.402 2.637-2.402 1.582 0 2.613.949 2.613 2.215 0 1.002-.6 1.667-1.287 2.43l-.096.107-1.974 2.22v.077h3.498V12H5.422v-.832l2.97-3.293c.434-.475.903-1.008.903-1.705 0-.744-.557-1.236-1.313-1.236-.843 0-1.336.615-1.336 1.306"/>
+            </svg>
+            Вставьте ссылку в форму, выберите действие и нажмите <b>Погнали</b>.
+        </p>
+        <br>
+
+        <p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dot"
+                 viewBox="0 0 16 16">
+                <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+            </svg>
+            <b>Скачивание</b> - скачать видео
+            <br>
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dot"
+                 viewBox="0 0 16 16">
+                <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+            </svg>
+            <b>Смотреть LIVE</b> - смотреть видео напрямую с YouTube. Качество видео регулируется со стороны YouTube. Минимальная задержка.
+            <br>
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dot"
+                 viewBox="0 0 16 16">
+                <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+            </svg>
+            <b>Смотреть после загрузки</b> - видео скачивается на сервер и транслируется в наилучшем качестве (задержка на
+            скачивание)
+        </p>
     </div>
 </main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("downloadForm");
+        const spinner = document.getElementById("loadingSpinner");
+
+        form.addEventListener("submit", async function(e) {
+            e.preventDefault();
+            spinner.style.display = "block";
+
+            const formData = new FormData(form);
+            const action = formData.get("action");
+
+            if (action === "download") {
+                try {
+                    const response = await fetch("/download", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    await new Promise(resolve => setTimeout(resolve, 4000));
+                    const data = await response.json();
+
+                    if (data.task_id) {
+                        await waitForTask(data.status_url, data.download_url);
+                    } else {
+                        alert("Ошибка: задача не запущена.");
+                    }
+
+                } catch (err) {
+                    console.error("Ошибка:", err);
+                    alert("Произошла ошибка, напишите нам на почту внизу что произошло");
+                } finally {
+                    spinner.style.display = "none";
+                }
+
+            } else if ((action === "live_play") {
+                const response = await fetch("/download", {
+                    method: "POST",
+                    body: formData
+                });
+            }
+        });
+
+        async function waitForTask(statusUrl, downloadUrl) {
+            for (let i = 0; i < 40; i++) {
+                const res = await fetch(statusUrl);
+                const status_data = await res.json();
+
+                if (status_data.status === "SUCCESS") {
+                    window.location.href = downloadUrl;
+                    break;
+                }
+
+                if (status_data.status === "FAILURE") {
+                    alert("Ошибка скачивания");
+                    break;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+        }
+    });
+</script>
+
+
 {% endblock %}
