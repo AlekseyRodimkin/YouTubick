@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import JSONResponse
 
-from config.logging_config import logger
+from config import logger
 
-from .routes.main import main_router
 from .routes.download import download_router
+from .routes.live_play import live_router
+from .routes.main import main_router
 
 app_logger = logger.bind(name="app")
 
@@ -25,10 +27,11 @@ async def shutdown():
 
 app.include_router(main_router)
 app.include_router(download_router)
+app.include_router(live_router)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
-@app.get("/api/healthchecker")
+@app.get("/api/healthchecker", status_code=200, response_class=JSONResponse)
 def root():
     app_logger.info(" app.get('/api/healthchecker') ")
     return {"message": "The API is LIVE!!"}

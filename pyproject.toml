@@ -1,31 +1,27 @@
-[project]
-name = "app"
-version = "0.1.0"
-description = ""
-authors = [
-    {name = "aleksei_rodimkin",email = "alexeyrodimkin@gmail.com"}
-]
-readme = "README.md"
-requires-python = ">=3.12,<4.0"
-dependencies = [
-    "fastapi (>=0.115.12,<0.116.0)",
-    "uvicorn (>=0.34.2,<0.35.0)",
-    "yt-dlp (>=2025.4.30,<2026.0.0)",
-    "loguru (>=0.7.3,<0.8.0)",
-    "dotenv (>=0.9.9,<0.10.0)",
-    "jinja2 (>=3.1.6,<4.0.0)",
-    "python-multipart (>=0.0.20,<0.0.21)",
-    "aiohttp (>=3.11.18,<4.0.0)",
-    "redis (>=6.1.0,<7.0.0)",
-    "celery (>=5.5.2,<6.0.0)",
-    "aiofiles (>=24.1.0,<25.0.0)",
-]
-
 [tool.poetry]
+name = "youtube_video"
+version = "0.1.0"
+description = "YouTube video processing application"
+authors = ["aleksei_rodimkin <alexeyrodimkin@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+fastapi = "^0.115.12"
+uvicorn = "^0.34.2"
+yt-dlp = "^2025.4.30"
+loguru = "^0.7.3"
+python-dotenv = "^1.0.0"
+jinja2 = "^3.1.6"
+python-multipart = "^0.0.20"
+aiohttp = "^3.11.18"
+redis = "^6.1.0"
+celery = "^5.5.2"
+aiofiles = "^24.1.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.5"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"

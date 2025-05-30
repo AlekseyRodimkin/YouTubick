@@ -1,20 +1,24 @@
-import aiohttp
+import logging
 
-from fastapi import Request, Query, HTTPException
-from fastapi.responses import StreamingResponse
-from fastapi.routing import APIRouter
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import JSONResponse, StreamingResponse
 
-from config.logging_config import logger
-from app.services import get_stream_url, fetch_video_metadata, exception_handler
+from app.services import (
+    exception_handler,
+    fetch_video_metadata,
+    get_stream_url,
+    stream_generator,
+)
 
-work_router = APIRouter(prefix="", tags=["work"])
-app_logger = logger.bind(name="app")
+live_router = APIRouter()
+app_logger = logging.getLogger(__name__)
 
 
-@work_router.get("/live_play")
+@live_router.get("/live_play", status_code=200, response_class=JSONResponse)
 @exception_handler()
-async def fast_play(request: Request, url: str = Query(...)):
-    app_logger.info(f"GET /fast_play?url={url}")
+async def get_live_play_url(request: Request, url: str) -> JSONResponse:
+    """Возвращает JSON с URL для стриминга видео."""
+    app_logger.info(f"GET /live_play?url={url}")
 
     stream_url = await get_stream_url(url)
     if not stream_url:
@@ -27,19 +31,37 @@ async def fast_play(request: Request, url: str = Query(...)):
         )
 
     file_size, supports_range = await fetch_video_metadata(stream_url)
+    content_type = "video/mp4"
 
-    range_header = request.headers.get('Range')
+    return JSONResponse(
+        status_code=200,
+        content={
+            "stream_url": stream_url,
+            "content_type": content_type,
+            "supports_range": supports_range,
+            "file_size": file_size,
+        },
+    )
+
+
+@live_router.get("/stream", response_class=StreamingResponse)
+@exception_handler()
+async def stream_video(request: Request, stream_url: str) -> StreamingResponse:
+    """Стримит видео по полученному URL"""
+    file_size, supports_range = await fetch_video_metadata(stream_url)
+
+    range_header = request.headers.get("Range")
     start, end = 0, file_size - 1 if file_size else None
 
     if range_header and supports_range:
         try:
-            range_type, ranges = range_header.split('=')
-            if range_type.strip() == 'bytes':
-                start, end = ranges.split('-')
+            range_type, ranges = range_header.split("=")
+            if range_type.strip() == "bytes":
+                start, end = ranges.split("-")
                 start = int(start)
                 end = int(end) if end else file_size - 1
         except Exception as e:
-            app_logger.warning(f"Invalid Range header: {e}")
+            app_logger.warning(f"Invalid Range header in {stream_url}: {e}")
 
     headers = {
         "Accept-Ranges": "bytes",
@@ -52,21 +74,11 @@ async def fast_play(request: Request, url: str = Query(...)):
     else:
         status_code = 200
 
-    async def stream_generator():
-        timeout = aiohttp.ClientTimeout(total=3600)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            req_headers = {"Range": f"bytes={start}-{end}"} if supports_range else {}
-
-            async with session.get(stream_url, headers=req_headers) as resp:
-                if resp.status not in (200, 206):
-                    raise aiohttp.ClientError(f"Invalid response status: {resp.status}")
-
-                async for chunk in resp.content.iter_chunked(1024 * 8):  # 8KB chunks
-                    yield chunk
-
     return StreamingResponse(
-        stream_generator(),
+        stream_generator(
+            start=start, end=end, supports_range=supports_range, stream_url=stream_url
+        ),
         status_code=status_code,
         headers=headers,
-        media_type="video/mp4"
+        media_type="video/mp4",
     )

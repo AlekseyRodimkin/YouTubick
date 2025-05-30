@@ -1,0 +1,62 @@
+services:
+  web:
+    build: .
+    image: fastapi_app:latest
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    #    restart: unless-stopped
+    depends_on:
+      - redis
+    env_file: .env
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - BTC_ADDRESS=${BTC_ADDRESS}
+      - ETH_ADDRESS=${ETH_ADDRESS}
+      - SOL_ADDRESS=${SOL_ADDRESS}
+    volumes:
+      - shared_data:/uploads
+    networks:
+      - my_network
+
+  worker:
+    image: fastapi_app:latest
+    container_name: celery_worker
+    env_file: .env
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    command: celery -A config.config worker
+    volumes:
+      - shared_data:/uploads
+    networks:
+      - my_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    #    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - my_network
+
+
+networks:
+  my_network:
+
+volumes:
+  redis_data:
+  shared_data:
+
