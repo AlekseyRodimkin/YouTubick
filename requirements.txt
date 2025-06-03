@@ -14,6 +14,7 @@ click-plugins==1.1.1
 click-repl==0.3.0
 fastapi==0.115.12
 frozenlist==1.6.0
+gunicorn==23.0.0
 h11==0.16.0
 idna==3.10
 Jinja2==3.1.6
@@ -22,6 +23,7 @@ loguru==0.7.3
 MarkupSafe==3.0.2
 multidict==6.4.4
 mypy_extensions==1.1.0
+packaging==25.0
 pathspec==0.12.1
 platformdirs==4.3.8
 prompt_toolkit==3.0.51

@@ -12,12 +12,14 @@ from fastapi.templating import Jinja2Templates
 templates = Jinja2Templates(
     directory=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "app", "static", "templates")
 )
+
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
 SMTP_SERVER = os.getenv("SMTP_SERVER", None)
 SMTP_PORT = os.getenv("SMTP_PORT", None)
 SMTP_USER = os.getenv("SMTP_USER", None)
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", None)
+DOMAIN = os.getenv("DOMAIN", None)
 
 celery_app = Celery(
     "tasks",

@@ -4,7 +4,7 @@ services:
     image: fastapi_app:latest
     container_name: fastapi_app
     ports:
-      - "8000:8000"
+      - "8080:8080"
     #    restart: unless-stopped
     depends_on:
       - redis
@@ -19,8 +19,13 @@ services:
       - BTC_ADDRESS=${BTC_ADDRESS}
       - ETH_ADDRESS=${ETH_ADDRESS}
       - SOL_ADDRESS=${SOL_ADDRESS}
+      - VIRTUAL_HOST=${DOMAIN}
+      - LETSENCRYPT_HOST=${DOMAIN}
+      - LETSENCRYPT_EMAIL=${SMTP_USER}
     volumes:
       - shared_data:/uploads
+    expose:
+      - "8080"
     networks:
       - my_network
 
@@ -46,11 +51,39 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    #    restart: unless-stopped
+    restart: unless-stopped
     volumes:
       - redis_data:/data
     networks:
       - my_network
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    volumes:
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro
+    networks:
+      - my_network
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-letsencrypt
+    restart: unless-stopped
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs
+    networks:
+      - my_network
+
 
 
 networks:
@@ -59,4 +92,5 @@ networks:
 volumes:
   redis_data:
   shared_data:
+  certs:
 
