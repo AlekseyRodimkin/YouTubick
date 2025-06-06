@@ -2,24 +2,22 @@
 {% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
-<main class="container py-4" style="background-color: rgb(35, 39, 43); border-radius: 1.5em;">
+<main class="container py-4 bg-body rounded-4">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <div class="list-group">
                 {% for address in crypto_addresses %}
-                <div class="list-group-item bg-secondary text-white mb-2 rounded-3 p-3">
+                <div class="list-group-item bg-body-secondary text-body mb-2 rounded-3 p-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
                             <!-- Лого -->
                             <span class="fw-bold">{{ address.currency }}</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <input type="text"
-                                   class="form-control form-control-sm bg-dark text-white me-2 copy-input"
+                            <input type="text" class="form-control form-control-sm bg-body text-body me-2 copy-input"
                                    value="{{ address.address }}"
-                                   readonly
-                                   style="width: 180px;">
-                            <button class="btn btn-sm btn-outline-light copy-btn">
+                                   readonly>
+                            <button class="btn btn-sm btn-outline-secondary copy-btn">
                                 <i class="bi bi-clipboard"></i> Копировать
                             </button>
                         </div>

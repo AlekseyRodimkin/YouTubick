@@ -24,7 +24,7 @@ services:
       - LETSENCRYPT_HOST=${DOMAIN}
       - LETSENCRYPT_EMAIL=${SMTP_USER}
     volumes:
-      - shared_data:/app/logs
+      - shared_data:/app/uploads
       - logs_data:/app/logs
     expose:
       - "8080"
@@ -46,7 +46,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
     command: celery -A config.config worker --loglevel=info
     volumes:
-      - shared_data:/app/logs
+      - shared_data:/app/uploads
       - logs_data:/app/logs
     networks:
       - youtubick_network
