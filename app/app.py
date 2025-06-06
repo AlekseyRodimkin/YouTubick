@@ -34,4 +34,4 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 @app.get("/api/healthchecker", status_code=200, response_class=JSONResponse)
 def root():
     app_logger.info(" app.get('/api/healthchecker') ")
-    return {"message": "The API is LIVE!!"}
+    return {"message": "YouTubick is LIVE!!"}

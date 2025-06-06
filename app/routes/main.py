@@ -19,7 +19,6 @@ async def index(request: Request) -> HTMLResponse:
         "index.html",
         {
             "request": request,
-            "title": " Главная страница",
         },
     )
 

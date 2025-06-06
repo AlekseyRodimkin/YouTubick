@@ -1,5 +1,8 @@
 FROM python:3.12
 
+RUN addgroup --gid 1000 appgroup && \
+    adduser --uid 1000 --gid 1000 --disabled-password --gecos "" appuser
+
 WORKDIR /app
 
 COPY requirements.txt .
@@ -12,4 +15,6 @@ RUN apt-get update && \
 
 COPY . .
 
-CMD ["gunicorn", "app.app:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8000"]
+USER appuser
+
+CMD ["gunicorn", "app.app:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8080"]

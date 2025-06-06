@@ -1,9 +1,9 @@
 [tool.poetry]
-name = "youtube_video"
+name = "youtubick"
 version = "0.1.0"
 description = "YouTube video processing application"
 authors = ["aleksei_rodimkin <alexeyrodimkin@gmail.com>"]
-license = "MIT"
+license = ""
 readme = "README.md"
 
 [tool.poetry.dependencies]
