@@ -2,13 +2,12 @@ import os
 
 import yt_dlp
 
-from config import logger
+from config import logger, uploads_path
 
 app_logger = logger.bind(name="app")
-UPLOAD_DIR = "/uploads"
 
 
-def download_video(url: str, filename: str, output_dir=UPLOAD_DIR):
+def download_video(url: str, filename: str, output_dir=uploads_path):
     """Скачивает видео, возвращает имя готового файла"""
     try:
         app_logger.info(f"download_video({url})")

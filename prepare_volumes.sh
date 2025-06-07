@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# docker run --rm   -v youtubick_shared_data:/app/uploads   alpine sh -c "\
+#      mkdir -p /app/uploads && \
+#      touch /app/uploads/test.txt && \
+#      chown -R 1000:1000 /app/uploads && \
+#      chmod -R u+rwX /app/uploads"
+
 LOGS_VOLUME_NAME=youtubick_logs_data
 UPLOADS_VOLUME_NAME=youtubick_shared_data
 USER_ID=1000
@@ -19,14 +25,17 @@ docker volume create "$UPLOADS_VOLUME_NAME"
 
 echo "----- Создаём директории и лог-файлы + выставляем владельца $USER_ID:$GROUP_ID..."
 docker run --rm \
+  -e UID="$USER_ID" \
+  -e GID="$GROUP_ID" \
   -v "$LOGS_VOLUME_NAME":/app/logs \
   -v "$UPLOADS_VOLUME_NAME":/app/uploads \
   alpine sh -c "\
     mkdir -p /app/logs /app/uploads && \
     touch /app/logs/app_debug.log /app/logs/app_error.log && \
-    chown -R $USER_ID:$GROUP_ID /app/logs /app/uploads"
+    chown -R \$UID:\$GID /app/logs /app/uploads && \
+    chmod -R u+rwX /app/uploads /app/logs"
 
-echo "----- Удаляем образ alpine..."
-docker rmi alpine
+echo "----- Удаляем образ alpine (если он не используется)..."
+docker rmi alpine 2>/dev/null || echo "----- Образ alpine используется и не может быть удалён сейчас"
 
 echo "----- Готово -----"

@@ -4,8 +4,8 @@ services:
     image: fastapi_app:latest
     container_name: fastapi_app
     user: "1000:1000"
-#    ports:
-#      - "8080:8080"
+    #    ports:
+    #      - "8080:8080"
     restart: unless-stopped
     depends_on:
       - redis
@@ -24,6 +24,7 @@ services:
       - LETSENCRYPT_HOST=${DOMAIN}
       - LETSENCRYPT_EMAIL=${SMTP_USER}
     volumes:
+      - ./app/static:/app/static:ro
       - shared_data:/app/uploads
       - logs_data:/app/logs
     expose:
@@ -74,6 +75,7 @@ services:
       - /usr/share/nginx/html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - certs:/etc/nginx/certs:ro
+      - ./app/static:/app/static:ro
     networks:
       - youtubick_network
       - nginx-proxy
@@ -93,7 +95,6 @@ services:
       - nginx-proxy
 
 
-
 networks:
   youtubick_network:
     name: youtubick_network
@@ -106,6 +107,8 @@ volumes:
     name: youtubick_redis_data
   shared_data:
     name: youtubick_shared_data
+    external: true
   logs_data:
     name: youtubick_logs_data
+    external: true
 
