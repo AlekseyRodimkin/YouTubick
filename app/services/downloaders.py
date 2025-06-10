@@ -19,9 +19,21 @@ def download_video(url: str, filename: str, output_dir=uploads_path):
             "merge_output_format": "mp4",
             "outtmpl": output_template,
             "noplaylist": True,
+            "ignoreerrors": True,
+            "geo_bypass": True,
+            "age_limit": 18,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android", "web"],
+                    "skip": ["dash", "hls"]
+                }
+            },
             "postprocessor_args": ["-movflags", "+faststart"],
             "quiet": False,
             "no_warnings": True,
+            "format_sort": ["res:1080", "vcodec:avc1", "acodec:mp4a"],
+            "allow_multiple_video_streams": True,
+            "allow_multiple_audio_streams": True,
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)

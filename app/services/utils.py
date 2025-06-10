@@ -42,10 +42,21 @@ async def get_stream_url(url: str) -> str | None:
     """Получает прямую ссылку на видео через yt-dlp"""
     ydl_opts = {
         "quiet": True,
-        "no_warnings": True,
-        "format": "best",
+        "no_warnings": False,
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         "extract_flat": False,
-        "socket_timeout": 10,
+        "socket_timeout": 15,
+        "ignoreerrors": True,
+        "geo_bypass": True,
+        "age_limit": 18,
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "web"],
+                "skip": ["dash", "hls"]
+            }
+        },
+        "allow_multiple_video_streams": True,
+        "allow_multiple_audio_streams": True,
     }
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
