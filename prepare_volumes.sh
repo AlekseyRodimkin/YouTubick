@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# docker run --rm   -v youtubick_shared_data:/app/uploads   alpine sh -c "\
-#      mkdir -p /app/uploads && \
-#      touch /app/uploads/test.txt && \
-#      chown -R 1000:1000 /app/uploads && \
-#      chmod -R u+rwX /app/uploads"
-
 LOGS_VOLUME_NAME=youtubick_logs_data
 UPLOADS_VOLUME_NAME=youtubick_shared_data
 USER_ID=1000

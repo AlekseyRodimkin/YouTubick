@@ -1,11 +1,11 @@
 location /static/ {
-    alias /app/static/;
+    root /app;
     access_log off;
     expires 1d;
 }
 
 location = /favicon.ico {
-    alias /app/static/favicon.ico;
+    root /app/static;
     access_log off;
     expires 1d;
 }

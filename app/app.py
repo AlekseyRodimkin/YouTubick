@@ -31,7 +31,6 @@ app.include_router(live_router)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
-@app.get("/api/healthchecker", status_code=200, response_class=JSONResponse)
+@app.get("/healthchecker", status_code=200, response_class=JSONResponse)
 def root():
-    app_logger.info(" app.get('/api/healthchecker') ")
-    return {"message": "YouTubick is LIVE!!"}
+    return

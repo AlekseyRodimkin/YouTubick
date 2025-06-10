@@ -1,7 +1,7 @@
 FROM python:3.12
 
-RUN addgroup --gid 1000 appgroup && \
-    adduser --uid 1000 --gid 1000 --disabled-password --gecos "" appuser
+RUN addgroup --gid 1000 appgroup \
+    && adduser --disabled-password --gecos "" --uid 1000 --gid 1000 appuser
 
 WORKDIR /app
 
@@ -14,6 +14,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY . .
+
+RUN mkdir -p /app/uploads && chown -R 1000:1000 /app/uploads
+RUN mkdir -p /app/logs && chown -R 1000:1000 /app/logs
 
 USER appuser
 

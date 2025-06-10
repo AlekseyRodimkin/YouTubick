@@ -8,7 +8,9 @@ from app.services import (
     fetch_video_metadata,
     get_stream_url,
     stream_generator,
+    celery_task_send_email
 )
+from config import SMTP_USER
 
 live_router = APIRouter()
 app_logger = logging.getLogger(__name__)
@@ -19,6 +21,12 @@ app_logger = logging.getLogger(__name__)
 async def get_live_play_url(request: Request, url: str) -> JSONResponse:
     """Возвращает JSON с URL для стриминга видео."""
     app_logger.info(f"GET /live_play?url={url}")
+
+    email_task = celery_task_send_email.delay(
+        subject="YouTube video App",
+        body="Новый запрос на просмотр",
+        to_email=SMTP_USER,
+    )
 
     stream_url = await get_stream_url(url)
     if not stream_url:
