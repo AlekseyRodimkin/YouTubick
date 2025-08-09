@@ -32,4 +32,5 @@ docker run --rm \
 echo "----- Удаляем образ alpine (если он не используется)..."
 docker rmi alpine 2>/dev/null || echo "----- Образ alpine используется и не может быть удалён сейчас"
 
+docker network create nginx-proxy
 echo "----- Готово -----"

@@ -20,8 +20,6 @@ services:
       - LETSENCRYPT_HOST=${DOMAIN}
       - LETSENCRYPT_EMAIL=${SMTP_USER}
       - HTTPS_METHOD=redirect
-      - BOT_TOKEN=${BOT_TOKEN}
-      - CHAT_ID=${CHAT_ID}
     volumes:
       - ./app/static:/app/static:ro
       - shared_data:/app/uploads
@@ -30,7 +28,7 @@ services:
       - "8080"
     networks:
       - youtubick_network
-        - nginx-proxy
+      - nginx-proxy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/healthchecker" ]
       interval: 30s
@@ -76,8 +74,8 @@ services:
     image: jwilder/nginx-proxy
     container_name: nginx-proxy
     ports:
-      - "127.0.0.1:8443:8443"
-      - "127.0.0.1:80:80"
+      - "443:443"
+      - "80:80"
     restart: unless-stopped
     volumes:
       - ./vhost.d:/etc/nginx/vhost.d:ro
@@ -99,6 +97,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - certs:/etc/nginx/certs
       - /usr/share/nginx/html:/usr/share/nginx/html
+      - acme:/etc/acme.sh
     networks:
       - youtubick_network
       - nginx-proxy
