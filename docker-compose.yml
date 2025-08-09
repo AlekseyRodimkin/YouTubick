@@ -4,8 +4,8 @@ services:
     image: fastapi_app:latest
     container_name: fastapi_app
     user: "1000:1000"
-#    ports:
-#      - "8080:8080"
+    #    ports:
+    #      - "8080:8080"
     restart: unless-stopped
     depends_on:
       - redis
@@ -13,10 +13,6 @@ services:
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-      - SMTP_SERVER=${SMTP_SERVER}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
       - BTC_ADDRESS=${BTC_ADDRESS}
       - ETH_ADDRESS=${ETH_ADDRESS}
       - SOL_ADDRESS=${SOL_ADDRESS}
@@ -24,6 +20,8 @@ services:
       - LETSENCRYPT_HOST=${DOMAIN}
       - LETSENCRYPT_EMAIL=${SMTP_USER}
       - HTTPS_METHOD=redirect
+      - BOT_TOKEN=${BOT_TOKEN}
+      - CHAT_ID=${CHAT_ID}
     volumes:
       - ./app/static:/app/static:ro
       - shared_data:/app/uploads
@@ -32,7 +30,7 @@ services:
       - "8080"
     networks:
       - youtubick_network
-      - nginx-proxy
+        - nginx-proxy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/healthchecker" ]
       interval: 30s
@@ -46,13 +44,11 @@ services:
       - redis
     user: "1000:1000"
     env_file: .env
+    restart: unless-stopped
+
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-      - SMTP_SERVER=${SMTP_SERVER}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
     command: celery -A config.config worker --loglevel=info
     volumes:
       - shared_data:/app/uploads
@@ -80,8 +76,8 @@ services:
     image: jwilder/nginx-proxy
     container_name: nginx-proxy
     ports:
-      - "80:80"
-      - "443:443"
+      - "127.0.0.1:8443:8443"
+      - "127.0.0.1:80:80"
     restart: unless-stopped
     volumes:
       - ./vhost.d:/etc/nginx/vhost.d:ro

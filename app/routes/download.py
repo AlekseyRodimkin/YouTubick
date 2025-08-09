@@ -10,12 +10,11 @@ from starlette.responses import JSONResponse
 
 from app.services import (
     celery_task_download_video,
-    celery_task_send_email,
     exception_handler,
     extract_video_id,
     file_streamer,
 )
-from config import SMTP_USER, logger, REDIS_HOST, REDIS_PORT
+from config import logger, REDIS_HOST, REDIS_PORT
 
 download_router = APIRouter(prefix="", tags=["work"])
 app_logger = logger.bind(name="app")
@@ -45,11 +44,7 @@ async def download(request: Request, url: str = Form(...)) -> dict:
         }
 
     download_task = celery_task_download_video.delay(url)
-    email_task = celery_task_send_email.delay(
-        subject="YouTube video App",
-        body="Новый запрос на скачивание",
-        to_email=SMTP_USER,
-    )
+
     return {
         "task_id": download_task.id,
         "status_url": f"/status/{download_task.id}",
@@ -86,6 +81,7 @@ async def get_video(request: Request, task_id: str):
     else:
         app_logger.warning(f"Файл не найден: {filename}")
         raise HTTPException(404, "File not found")
+
 
 @download_router.get("/status/{task_id}", status_code=200, response_class=JSONResponse)
 @exception_handler()
