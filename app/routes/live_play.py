@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
@@ -9,17 +7,16 @@ from app.services import (
     get_stream_url,
     stream_generator,
 )
+from ..services.utils import send_bot_notif
 
 live_router = APIRouter()
-app_logger = logging.getLogger(__name__)
 
 
 @live_router.get("/live_play", status_code=200, response_class=JSONResponse)
 @exception_handler()
 async def get_live_play_url(request: Request, url: str) -> JSONResponse:
     """Возвращает JSON с URL для стриминга видео."""
-    app_logger.info(f"GET /live_play?url={url}")
-
+    await send_bot_notif()
     stream_url = await get_stream_url(url)
     if not stream_url:
         raise HTTPException(
@@ -49,7 +46,6 @@ async def get_live_play_url(request: Request, url: str) -> JSONResponse:
 async def stream_video(request: Request, stream_url: str) -> StreamingResponse:
     """Стримит видео по полученному URL"""
     file_size, supports_range = await fetch_video_metadata(stream_url)
-
     range_header = request.headers.get("Range")
     start, end = 0, file_size - 1 if file_size else None
 
@@ -61,7 +57,7 @@ async def stream_video(request: Request, stream_url: str) -> StreamingResponse:
                 start = int(start)
                 end = int(end) if end else file_size - 1
         except Exception as e:
-            app_logger.warning(f"Invalid Range header in {stream_url}: {e}")
+            pass
 
     headers = {
         "Accept-Ranges": "bytes",

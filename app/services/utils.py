@@ -1,41 +1,8 @@
-import os
-import smtplib
-import time
-import uuid
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from urllib.parse import parse_qs, urlparse
-
 import aiohttp
-import redis
+from urllib.parse import parse_qs, urlparse
 from yt_dlp import YoutubeDL
 
-from config import SMTP_PASSWORD, SMTP_SERVER, SMTP_USER, logger, REDIS_HOST, REDIS_PORT
-
-app_logger = logger.bind(name="app")
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
-
-
-def send_mail(subject, body, to_email):
-    smtp_port = 587
-
-    msg = MIMEMultipart()
-    msg["From"] = SMTP_USER
-    msg["To"] = to_email
-    msg["Subject"] = subject
-
-    msg.attach(MIMEText(body, "plain"))
-
-    try:
-        server = smtplib.SMTP(SMTP_SERVER, smtp_port)
-        server.starttls()
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(SMTP_USER, to_email, msg.as_string())
-        server.quit()
-
-        app_logger.info("✅ Письмо успешно отправлено.")
-    except Exception as e:
-        app_logger.warning("❌ Ошибка при отправке письма:", e)
+from ..config import BOT_TOKEN, CHAT_ID
 
 
 async def get_stream_url(url: str) -> str | None:
@@ -72,12 +39,6 @@ async def fetch_video_metadata(stream_url: str):
             return content_length, accept_ranges == "bytes"
 
 
-def generate_unique_string(prefix: str = "") -> str:
-    """Генерирует уникальную строку с опциональным префиксом"""
-    unique_str = f"{prefix}{uuid.uuid4().hex}_{int(time.time() * 1000)}"
-    return unique_str
-
-
 async def is_valid_youtube_url(url: str) -> bool:
     """Проверяет, является ли youtube ссылка валидной"""
     result = urlparse(url)
@@ -108,23 +69,6 @@ async def is_valid_youtube_url(url: str) -> bool:
     return False
 
 
-def file_streamer(file_path: str, chunk_size: int = 1024 * 1024):
-    """Передает файл, удаляет по завершению"""
-    try:
-        with open(file_path, "rb") as f:
-            while chunk := f.read(chunk_size):
-                yield chunk
-    finally:
-        os.remove(file_path)
-        filename = os.path.basename(file_path)
-        if "__" in filename:
-            _, tail = filename.split("__", 1)
-            video_id, *_ = tail.split(".", 1)
-            key = f"video:{video_id}"
-            r.delete(key)
-            app_logger.info(f"Redis key {key} удалён")
-
-
 async def stream_generator(start, end, supports_range, stream_url):
     timeout = aiohttp.ClientTimeout(total=3600)
 
@@ -150,7 +94,6 @@ async def stream_generator(start, end, supports_range, stream_url):
                 async for chunk in resp.content.iter_chunked(1024 * 8):
                     yield chunk
         except aiohttp.ClientConnectionError as e:
-            app_logger.error(f"[stream_generator] Connection error: {e}")
             return
 
 
@@ -167,3 +110,11 @@ def extract_video_id(url: str) -> str | None:
         return parsed_url.path.lstrip("/")
 
     return None
+
+
+async def send_bot_notif():
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": CHAT_ID, "text": "Новый запрос"}
+
+    async with aiohttp.ClientSession() as session:
+        await session.post(url, data=payload)

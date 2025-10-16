@@ -1,12 +1,8 @@
 import inspect
-import traceback
 from functools import wraps
-
 from fastapi import HTTPException, Request
 
-from config import logger, templates
-
-app_logger = logger.bind(name="app")
+from ..config import templates
 
 
 def exception_handler():
@@ -20,11 +16,9 @@ def exception_handler():
                 try:
                     return await func(request, *args, **kwargs)
                 except HTTPException as http_ex:
-                    app_logger.error(f"Error HTTP: {http_ex.detail}")
                     raise http_ex
                 except Exception as e:
-                    app_logger.error(f"Unhandled error: {traceback.format_exc()}")
-
+                    pass
                     db = kwargs.get("db") or next(
                         (arg for arg in args if hasattr(arg, "rollback")), None
                     )  # rollback

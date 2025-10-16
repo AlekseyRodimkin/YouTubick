@@ -1,29 +1,21 @@
 services:
   web:
     build: .
-    image: fastapi_app:latest
-    container_name: fastapi_app
-    user: "1000:1000"
-    #    ports:
-    #      - "8080:8080"
+    image: youtubick_app:latest
+    container_name: youtubick_app
+#    ports:
+#      - "8080:8080"
     restart: unless-stopped
-    depends_on:
-      - redis
     env_file: .env
     environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
       - BTC_ADDRESS=${BTC_ADDRESS}
       - ETH_ADDRESS=${ETH_ADDRESS}
       - SOL_ADDRESS=${SOL_ADDRESS}
       - VIRTUAL_HOST=${DOMAIN}
       - LETSENCRYPT_HOST=${DOMAIN}
-      - LETSENCRYPT_EMAIL=${SMTP_USER}
       - HTTPS_METHOD=redirect
     volumes:
       - ./app/static:/app/static:ro
-      - shared_data:/app/uploads
-      - logs_data:/app/logs
     expose:
       - "8080"
     networks:
@@ -31,41 +23,6 @@ services:
       - nginx-proxy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/healthchecker" ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  worker:
-    image: fastapi_app:latest
-    container_name: celery_worker
-    depends_on:
-      - redis
-    user: "1000:1000"
-    env_file: .env
-    restart: unless-stopped
-
-    environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-    command: celery -A config.config worker --loglevel=info
-    volumes:
-      - shared_data:/app/uploads
-      - logs_data:/app/logs
-    networks:
-      - youtubick_network
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-    networks:
-      - youtubick_network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -102,21 +59,13 @@ services:
       - youtubick_network
       - nginx-proxy
 
-
 networks:
   youtubick_network:
     name: youtubick_network
   nginx-proxy:
-    external: true
+    name: nginx-proxy
 
 volumes:
   certs:
-  redis_data:
-    name: youtubick_redis_data
-  shared_data:
-    name: youtubick_shared_data
-    external: true
-  logs_data:
-    name: youtubick_logs_data
-    external: true
+  acme:
 
