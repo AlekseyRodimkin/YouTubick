@@ -14,6 +14,8 @@ services:
       - VIRTUAL_HOST=${DOMAIN}
       - LETSENCRYPT_HOST=${DOMAIN}
       - HTTPS_METHOD=redirect
+      - BOT_TOKEN=${BOT_TOKEN}
+      - CHAT_ID=${CHAT_ID}
     volumes:
       - ./app/static:/app/static:ro
     expose:
