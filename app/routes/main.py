@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from starlette.responses import JSONResponse
+from fastapi.responses import FileResponse
 
 from app.services import exception_handler, is_valid_youtube_url
 
@@ -37,3 +38,8 @@ async def validate_url(url: str) -> dict:
         raise HTTPException(status_code=400, detail="Некорректная ссылка")
 
     return {"status": "ok"}
+
+
+@main_router.get("/robots.txt")
+async def robots_txt():
+    return FileResponse("robots.txt")
