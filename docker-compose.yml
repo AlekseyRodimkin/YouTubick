@@ -3,66 +3,16 @@ services:
     build: .
     image: youtubick_app:latest
     container_name: youtubick_app
-#    ports:
-#      - "8080:8080"
+    ports:
+      - "8080:8080"
     restart: unless-stopped
     env_file: .env
     environment:
       - BTC_ADDRESS=${BTC_ADDRESS}
       - ETH_ADDRESS=${ETH_ADDRESS}
       - SOL_ADDRESS=${SOL_ADDRESS}
-      - VIRTUAL_HOST=${DOMAIN}
-      - LETSENCRYPT_HOST=${DOMAIN}
       - HTTPS_METHOD=redirect
       - BOT_TOKEN=${BOT_TOKEN}
       - CHAT_ID=${CHAT_ID}
     volumes:
-      - ./app/static:/app/static:ro
-    expose:
-      - "8080"
-    networks:
-      - youtubick_network
-      - nginx-proxy
-
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx-proxy
-    ports:
-      - "443:443"
-      - "80:80"
-    restart: unless-stopped
-    volumes:
-      - ./vhost.d:/etc/nginx/vhost.d:ro
-      - /usr/share/nginx/html:/usr/share/nginx/html
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - certs:/etc/nginx/certs:ro
-      - ./app/static:/app/static:ro
-    networks:
-      - youtubick_network
-      - nginx-proxy
-
-  letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    container_name: nginx-letsencrypt
-    restart: unless-stopped
-    environment:
-      - NGINX_PROXY_CONTAINER=nginx-proxy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - certs:/etc/nginx/certs
-      - /usr/share/nginx/html:/usr/share/nginx/html
-      - acme:/etc/acme.sh
-    networks:
-      - youtubick_network
-      - nginx-proxy
-
-networks:
-  youtubick_network:
-    name: youtubick_network
-  nginx-proxy:
-    name: nginx-proxy
-
-volumes:
-  certs:
-  acme:
-
+      - /var/www/static:/app/static:ro
