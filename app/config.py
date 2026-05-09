@@ -11,7 +11,6 @@ templates = Jinja2Templates(
     directory=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "app", "static", "templates")
 )
 
-DOMAIN = os.getenv("DOMAIN", None)
 BOT_TOKEN = os.getenv("BOT_TOKEN", None)
 CHAT_ID = os.getenv("CHAT_ID", None)
 
