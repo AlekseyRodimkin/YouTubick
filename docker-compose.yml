@@ -15,4 +15,4 @@ services:
       - BOT_TOKEN=${BOT_TOKEN}
       - CHAT_ID=${CHAT_ID}
     volumes:
-      - /var/www/static:/app/static:ro
+      - /var/www/html/youtubick/static:/app/app/static
